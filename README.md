@@ -24,4 +24,4 @@ It's a single HTML file with plain JavaScript and CSS. I kept the scoring rule-b
 
 All names, bookings and restaurant details in the demo are made up.
 
-Movin
+Movin Ankith
