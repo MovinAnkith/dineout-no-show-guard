@@ -1,0 +1,1 @@
+# dineout-no-show-guard
