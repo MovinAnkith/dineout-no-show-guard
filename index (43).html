@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dineout No-Show Guard</title>
+<style>
+:root{--bg:#fbf6f2;--card:#fff;--ink:#201a16;--mute:#7a6f68;--line:#eee3db;--brand:#fc8019;--brand2:#ff5a2c;--hi:#d93025;--mid:#d98a00;--lo:#1a8f55;--chip:#fff0e3;--sh:0 4px 16px rgba(80,40,10,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141010;--card:#201917;--ink:#f6ece4;--mute:#b3a69c;--line:#372b26;--chip:#3a2616;--hi:#ff8a80;--mid:#ffc947;--lo:#5fd397;--sh:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141010;--card:#201917;--ink:#f6ece4;--mute:#b3a69c;--line:#372b26;--chip:#3a2616;--hi:#ff8a80;--mid:#ffc947;--lo:#5fd397;--sh:none;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:22px 16px 56px}
+.hw{max-width:700px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.logo{font-size:28px;background:rgba(255,255,255,.2);border-radius:14px;width:50px;height:50px;display:grid;place-items:center}
+h1{margin:0;font-size:22px}header p{margin:0;font-size:13px;opacity:.9}
+.hw>div:nth-child(2){flex:1}
+main{max-width:700px;margin:-40px auto 0;padding:0 16px 40px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.k{background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--sh);border:1px solid var(--line)}
+.k b{display:block;font-size:24px;font-variant-numeric:tabular-nums}.k span{font-size:12px;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+h2{font-size:16px;margin:0 0 6px}.mute{color:var(--mute);font-size:13px}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+.pri{background:var(--brand);color:#fff;width:100%;margin-top:10px}.pri:disabled{opacity:.6}
+.sec{background:var(--chip);color:var(--ink)}.gh{background:rgba(255,255,255,.2);color:#fff;padding:8px 12px}
+.sl{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sl label{font-size:13px;color:var(--mute);display:block}.sl input{width:100%;accent-color:var(--brand)}
+.chips{display:flex;gap:8px;margin:4px 0 10px;overflow-x:auto}
+.chip{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;white-space:nowrap}.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:var(--sh);cursor:pointer}
+.top{display:flex;align-items:center;gap:10px}.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.top .t{flex:1;min-width:0}.nm{font-weight:700}.meta{font-size:13px;color:var(--mute)}
+.pill{font-size:12px;font-weight:700;border-radius:20px;padding:2px 10px;border:1.5px solid currentColor;white-space:nowrap}
+.bar{height:7px;border-radius:6px;background:var(--line);margin:10px 0 6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;transition:width .4s}
+.st{font-size:12px;color:var(--mute)}
+.det{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;cursor:default}
+.f{display:flex;justify-content:space-between;font-size:13px;padding:2px 0}.f b{font-variant-numeric:tabular-nums}
+.msg{margin:10px 0;padding:10px;border-radius:10px;background:var(--chip);font-size:14px;white-space:pre-wrap}
+.src{font-size:11px;color:var(--mute);margin-top:4px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}.acts button{flex:1}
+.hi{color:var(--hi)}.mid{color:var(--mid)}.lo{color:var(--lo)}
+.bg-hi{background:var(--hi)}.bg-mid{background:var(--mid)}.bg-lo{background:var(--lo)}
+.w{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.w:last-child{border:0}
+.ok{color:var(--lo);font-weight:600;font-size:13px}
+.note{font-size:12px;color:var(--mute);margin-top:14px}
+</style></head>
+<body>
+<header><div class="hw"><div class="logo">🛡️</div><div><h1>No-Show Guard</h1><p>Spice Route Kitchen · Indiranagar · Tonight (sample data)</p></div><button class="gh" id="rs">Reset</button></div></header>
+<main>
+<div class="kpis">
+<div class="k"><b id="k1">0</b><span>Bookings tonight</span></div>
+<div class="k"><b id="k2">0</b><span>Seats at high risk</span></div>
+<div class="k"><b id="k3">0</b><span>Seats refilled</span></div>
+<div class="k"><b id="k4">₹0</b><span>Revenue protected</span></div></div>
+<div class="card"><h2>Tonight’s plan</h2><div class="mute" id="plan"></div>
+<button class="pri" id="run">▶ Run the evening demo</button></div>
+<div class="card"><div class="sl">
+<div><label>Average spend per head: <b id="v1"></b></label><input type="range" id="s1" min="300" max="2000" step="50"></div>
+<div><label>Release table if no reply: <b id="v2"></b> before</label><input type="range" id="s2" min="1" max="4" step="1"></div></div></div>
+<div class="chips" id="chips"></div>
+<div id="list"></div>
+<div class="card"><h2>Waitlist</h2><div id="wl"></div></div>
+<p class="note">Prototype by Movin for the Swiggy Dineout GenAI challenge. Bookings and waitlist are sample data. The risk score is rule-based so owners can see every reason; messages are written by AI when available, otherwise by smart templates.</p>
+</main>
+<script>
+var $=function(i){return document.getElementById(i)};
+function h(t,c){var e=document.createElement(t);if(c)e.className=c;for(var i=2;i<arguments.length;i++){var k=arguments[i];if(k==null)continue;e.append(k.nodeType?k:document.createTextNode(k))}return e}
+var S,B,W;
+function init(){S={spend:800,win:2,filter:"All",open:null,seats:0};
+B=[{id:1,n:"Rohit Kumar",t:"7:00 PM",p:2,lead:1,ns:0,v:6,conf:true,st:"confirmed"},
+{id:2,n:"Priya Shetty",t:"7:30 PM",p:6,lead:12,ns:1,v:2,conf:false,st:"pending"},
+{id:3,n:"Arjun Mehta",t:"8:00 PM",p:4,lead:9,ns:2,v:3,conf:false,st:"pending"},
+{id:4,n:"Neha Rao",t:"8:00 PM",p:2,lead:0,ns:0,v:0,conf:false,st:"pending"},
+{id:5,n:"Imran Ali",t:"8:30 PM",p:8,lead:14,ns:0,v:1,conf:false,st:"pending"},
+{id:6,n:"Sneha Das",t:"9:00 PM",p:3,lead:2,ns:0,v:9,conf:true,st:"confirmed"}];
+W=[{n:"Karthik N.",p:2,st:"wait"},{n:"Divya P.",p:4,st:"wait"},{n:"Sanjay G.",p:6,st:"wait"},{n:"Meghana R.",p:3,st:"wait"}];
+$("s1").value=S.spend;$("s2").value=S.win}
+function sc(b){var f=[["Base risk",10]];
+if(b.lead>7)f.push(["Booked "+b.lead+" days ahead",20]);
+if(b.ns)f.push([b.ns+" past no-show"+(b.ns>1?"s":""),b.ns*20]);
+if(!b.v)f.push(["First-time diner",15]);
+if(b.p>=6)f.push(["Large party of "+b.p,10]);
+f.push(b.conf?["Guest confirmed",-25]:["Not confirmed yet",20]);
+var s=f.reduce(function(a,x){return a+x[1]},0);return{s:Math.max(0,Math.min(100,s)),f:f}}
+function lv(s){return s>=60?"hi":s>=35?"mid":"lo"}
+var LN={hi:"High",mid:"Medium",lo:"Low"};
+var STT={pending:"Not contacted yet",sent:"Confirmation sent, waiting for reply",confirmed:"Confirmed",released:"Table released to waitlist"};
+function act(b){return b.st==="pending"||b.st==="sent"}
+function money(n){return "₹"+n.toLocaleString("en-IN")}
+async function gen(prompt,fb){try{var s=await claude.use("sample");if(!s)throw 0;
+var r=await s.json(prompt+" Return ONLY JSON: {\"msg\":string}",{modelTier:"quick"});if(r&&r.msg)return{t:r.msg,ai:1}}catch(e){}return{t:fb,ai:0}}
+function confirmFb(b){var f=b.n.split(" ")[0],w=S.win+" hour"+(S.win>1?"s":"");
+if(b.ns)return "Hi "+f+", your table for "+b.p+" at "+b.t+" is held. A few bookings have gone unused lately, so we’ll free it up "+w+" before if we don’t hear back. Reply YES to keep it.";
+if(!b.v)return "Hi "+f+", welcome to Spice Route Kitchen! Your table for "+b.p+" at "+b.t+" is reserved. Reply YES to confirm, or CANCEL if plans changed so we can offer it to someone else.";
+if(b.p>=6)return "Hi "+f+", we’re holding a big table for "+b.p+" at "+b.t+". Could you reply YES with your final headcount? We’ll free it up "+w+" before if we don’t hear back.";
+return "Hi "+f+", quick check: are you still coming at "+b.t+" for "+b.p+"? Reply YES to confirm. We release unconfirmed tables "+w+" before."}
+async function send(b){b.st="sent";var r=await gen("Write a short, warm WhatsApp message (max 35 words) from Spice Route Kitchen to a guest named "+b.n.split(" ")[0]+" about tonight’s booking for "+b.p+" at "+b.t+". Reasons we are checking: "+sc(b).f.map(function(x){return x[0]}).join(", ")+". Ask them to reply YES to confirm; the table is released "+S.win+" hours before if no reply. Never accuse the guest.",confirmFb(b));b.m=r.t;b.ai=r.ai;draw()}
+function yes(b){b.conf=true;b.st="confirmed";draw()}
+async function noReply(b){b.st="released";var best=null;
+W.forEach(function(w){if(w.st==="wait"&&w.p<=b.p&&(!best||w.p>best.p))best=w});
+if(best){best.st="seated";best.t=b.t;S.seats+=best.p;
+var fb="Hi "+best.n.split(" ")[0]+", good news! A table for "+best.p+" just opened at Spice Route Kitchen for "+b.t+". Reply YES within 10 minutes to grab it.";
+var r=await gen("Write a short, excited WhatsApp message (max 30 words) from Spice Route Kitchen telling waitlisted guest "+best.n.split(" ")[0]+" a table for "+best.p+" opened at "+b.t+". Ask for YES within 10 minutes.",fb);best.m=r.t;best.ai=r.ai}
+draw()}
+function draw(){
+var a=B.filter(act),hi=a.filter(function(b){return lv(sc(b).s)==="hi"}),hs=hi.reduce(function(x,b){return x+b.p},0);
+$("k1").textContent=B.length;$("k2").textContent=hs;$("k3").textContent=S.seats;$("k4").textContent=money(S.seats*S.spend);
+$("v1").textContent=money(S.spend);$("v2").textContent=S.win+" hr";
+$("plan").textContent=hi.length?hi.length+" booking"+(hi.length>1?"s":"")+" ("+hs+" seats) look risky. Guard asks them to confirm first. If there is no reply "+S.win+" hour"+(S.win>1?"s":"")+" before, the table goes to the waitlist.":"No high-risk bookings are waiting. Nice.";
+var ch=$("chips");ch.textContent="";["All","High","Medium","Low"].forEach(function(n){var c=h("button","chip"+(S.filter===n?" on":""),n);c.onclick=function(){S.filter=n;draw()};ch.append(c)});
+var L=$("list");L.textContent="";
+B.slice().sort(function(x,y){return sc(y).s-sc(x).s}).forEach(function(b){
+var r=sc(b),l=lv(r.s);if(S.filter!=="All"&&LN[l]!==S.filter)return;
+var c=h("div","b"),top=h("div","top"),av=h("div","av bg-"+l,b.n[0]);
+var tx=h("div","t",h("div","nm",b.n),h("div","meta",b.t+" · party of "+b.p));
+top.append(av,tx,h("span","pill "+l,LN[l]+" "+r.s+"%"));c.append(top);
+var bar=h("div","bar"),i=h("i","bg-"+l);i.style.width=r.s+"%";bar.append(i);c.append(bar);
+c.append(h("div","st",STT[b.st]));
+c.onclick=function(){S.open=S.open===b.id?null:b.id;draw()};
+if(S.open===b.id){var d=h("div","det");d.onclick=function(e){e.stopPropagation()};
+d.append(h("div","mute","Why this score"));
+r.f.forEach(function(x){d.append(h("div","f",h("span",null,x[0]),h("b",null,(x[1]>0?"+":"")+x[1])))});
+if(b.m){d.append(h("div","msg",b.m),h("div","src",b.ai?"Written by AI":"Smart template (AI not available here)"))}
+var ac=h("div","acts");
+if(b.st==="pending"){var x=h("button","sec","Send confirmation");x.onclick=function(){x.disabled=true;x.textContent="Writing…";send(b)};ac.append(x)}
+if(b.st==="sent"){var y=h("button","sec","Guest replied YES");y.onclick=function(){yes(b)};var z=h("button","sec","No reply: release table");z.onclick=function(){noReply(b)};ac.append(y,z)}
+d.append(ac);c.append(d)}
+L.append(c)});
+var wl=$("wl");wl.textContent="";W.forEach(function(w){var r=h("div","w"),t=h("div",null,h("div","nm",w.n),h("div","meta","Party of "+w.p));
+var s=h("div",null,w.st==="seated"?h("span","ok","Seated at "+w.t):h("span","meta","Waiting"));
+r.append(t,s);wl.append(r);if(w.m){wl.append(h("div","msg",w.m),h("div","src",w.ai?"Written by AI":"Smart template"))}})}
+$("s1").oninput=function(){S.spend=+this.value;draw()};
+$("s2").oninput=function(){S.win=+this.value;draw()};
+$("rs").onclick=function(){init();draw()};
+$("run").onclick=async function(){var btn=this;btn.disabled=true;btn.textContent="Running tonight…";
+var todo=B.filter(function(b){return b.st==="pending"&&lv(sc(b).s)!=="lo"});
+for(var i=0;i<todo.length;i++){var b=todo[i];await send(b);await new Promise(function(r){setTimeout(r,500)});
+if(sc(b).s>=60)await noReply(b);else yes(b)}
+btn.disabled=false;btn.textContent="▶ Run the evening demo"};
+init();draw();
+</script></body></html>
